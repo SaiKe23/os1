@@ -1,2 +1,1041 @@
 OS Practical-Codes
-...(entire contents of your previous osp.txt file)...
+ 
+1. Shell Scripting
+
+
+
+i) Arithmetic Calculator
+ 
+echo "Enter first number:"
+read first
+echo "Enter second number:"
+read second
+ 
+echo "Choose 1.Addition 2.Subtraction 3.Multiplication 4.Division"
+read var
+case $var in
+1)echo "Ans=$first+$second=" `expr $first \+ $second`;;
+2)echo "Ans=$first-$second=" `expr $first \- $second`;;
+3)echo "Ans=$first*$second=" `expr $first \* $second`;;
+4)echo "Ans=$first/$second=$(echo "scale=2; $first / $second" | bc)`;;
+*)echo "Sorry, wrong choice";;
+esac
+ 
+ 
+
+ii) File and Directory Management
+mkdir archi2
+cd archi2
+echo "Enter content to be copied:"
+cat > file.txt
+ 
+chmod a+x file.txt
+cat > file1.txt
+cat > file2.txt
+ 
+echo "Files before deleting:"
+ls
+cp file.txt file1.txt
+mv file1.txt osl1.txt
+ 
+rm file2.txt
+echo "Files after deleting:"
+ls
+ 
+ 
+ 
+ 
+iii) Fibonacci Sequence
+a=0
+b=1
+echo "Fibonacci sequence upto 10: "
+for ((i=0; i<10; i++))
+do
+echo "$a "
+fn=$((a+b))
+a=$b
+b=$fn
+done
+ 
+
+
+iv) Even Numbers
+echo "Even numbers:"
+for ((i=1; i<=20; i++))
+do
+   if [ `expr $i \% 2` -eq 0 ]
+   then
+       echo "$i"
+   fi
+done
+ 
+
+
+v) Uppercase-Lowercase
+echo "Upper to Lower:"
+var1="MY NAME IS ARCHITA"
+echo $var1
+echo $var1 | tr '[A-Z]' '[a-z]'
+ 
+echo "Lower to Upper:"
+var2="this is os lab"
+echo $var2
+echo $var2 | tr '[a-z]' '[A-Z]'
+ 
+vi) Vowel-Consonant
+echo "Enter a character:"
+read char
+if [ "$char" = [AEIOUaeiou] ]
+then
+echo "$char is a vowel"
+else
+echo "$char is a consonant"
+fi
+ 
+
+
+
+
+
+
+
+
+ 
+2. Process Management (Process Control):
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+ 
+int array[100];
+int temp[20];
+pid_t num_pid;
+int n;
+ 
+void des(int array[], int n)
+{
+   for (int i = 0; i < n - 1; i++)
+   {
+       for (int j = 0; j < n - 1 - i; j++)
+       {
+           if (array[j] < array[j + 1])
+           {
+               int temp = array[j];
+               array[j] = array[j + 1];
+               array[j + 1] = temp;
+           }
+       }
+   }
+}
+ 
+void asc(int array[], int n)
+{
+   for (int i = 0; i < n - 1; i++)
+   {
+       for (int j = 0; j < n - 1 - i; j++)
+       {
+           if (array[j] > array[j + 1])
+           {
+               int temp = array[j];
+               array[j] = array[j + 1];
+               array[j + 1] = temp;
+           }
+       }
+   }
+}
+ 
+void forksort()
+{
+   num_pid = fork();
+   if (num_pid < 0)
+       printf("Error in fork execution!\n");
+ 
+   else if (num_pid == 0)
+   {
+       des(array, n);
+       printf("This is the child process with id: %d\n", getpid());
+       printf("Descending order of numbers:\n");
+ 
+       for (int i = 0; i < n; i++)
+       {
+           printf("%d ", array[i]);
+       }
+       printf("\n");
+   }
+ 
+   else
+   {
+       asc(array, n);
+       printf("This is the parent process with id: %d\n", getpid());
+       printf("Ascending order of numbers:\n");
+ 
+       for (int i = 0; i < n; i++)
+       {
+           printf("%d ", array[i]);
+       }
+       printf("\n");
+       wait(NULL);
+   }
+   exit(0);
+}
+ 
+int main()
+{
+   printf("Enter the number of elements: ");
+   scanf("%d", &n);
+   printf("Enter the elements:\n");
+   for (int i = 0; i < n; i++)
+   {scanf("%d", &array[i]);}
+   forksort();
+   return 0;
+}
+
+
+
+
+
+
+
+
+3. Process Management(FCFS: Non-Pre-emptive Scheduling):
+#include <stdio.h>
+ 
+int main()
+{
+   int pid[20], at[20], bt[20], ct[20], tat[20], wt[20];
+   int n;
+ 
+   printf("Enter the number of processes: ");
+   scanf("%d", &n);
+ 
+   for (int i = 0; i < n; i++)
+   {
+       pid[i] = i + 1;
+       printf("Enter the arrival time for process %d: ", i + 1);
+       scanf("%d", &at[i]);
+       printf("Enter the burst time for process %d: ", i + 1);
+       scanf("%d", &bt[i]);
+   }
+ 
+   for (int i = 0; i < n - 1; i++)
+   {
+       for (int j = 0; j < n - i - 1; j++)
+       {
+           if (at[j] > at[j + 1])
+           {
+               int temp = at[j];
+               at[j] = at[j + 1];
+               at[j + 1] = temp;
+ 
+               temp = bt[j];
+               bt[j] = bt[j + 1];
+               bt[j + 1] = temp;
+ 
+               temp = pid[j];
+               pid[j] = pid[j + 1];
+               pid[j + 1] = temp;
+           }
+       }
+   }
+ 
+   // Completion time
+   ct[0] = at[0] + bt[0];
+ 
+   for (int i = 1; i < n; i++)
+   {
+       if (at[i] > ct[i - 1])
+           ct[i] = at[i] + bt[i];
+       else
+           ct[i] = ct[i - 1] + bt[i];
+   }
+   // Turnaround time and waiting time
+   float totaltat = 0;
+   float totalwt = 0;
+ 
+   for (int i = 0; i < n; i++)
+   {
+       tat[i] = ct[i] - at[i];
+       totaltat = totaltat + tat[i];
+ 
+       wt[i] = tat[i] - bt[i];
+       totalwt = totalwt + wt[i];
+   }
+ 
+   printf("\n----------------------------------------------\n");
+   printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+   printf("----------------------------------------------\n");
+ 
+   for (int i = 0; i < n; i++)
+   {
+       printf("%d\t%d\t%d\t%d\t%d\t%d\n", pid[i], at[i], bt[i], ct[i], tat[i], wt[i]);
+   }
+ 
+   printf("\nGantt Chart:\n");
+   for (int i = 0; i < n; i++)
+   {
+       printf("  P%d  |", pid[i]);
+   }
+   printf("\n0");
+ 
+   for (int i = 0; i < n; i++)
+   {
+       printf("     %d", ct[i]);
+   }
+   printf("\n");
+   printf("\nThe average turn around time is : %.2f\n", totaltat / n);
+   printf("The average waiting time is : %.2f\n", totalwt / n);
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+
+4. Process Management (SRTF: Preemptive Scheduling):
+#include <stdio.h>
+int main()
+{
+   int pid[20], at[20], bt[20], ct[20], tat[20], wt[20], rt[20];
+   int n, completed = 0, time = 0, min_rt, shortest;
+   float totaltat = 0, totalwt = 0;
+   int finish_time;
+ 
+   int gc_pid[200], gc_time[200];
+   int gc_index = 0;
+ 
+   printf("Enter the number of processes: ");
+   scanf("%d", &n);
+ 
+   for (int i = 0; i < n; i++)
+   {
+       pid[i] = i + 1;
+       printf("Enter the arrival time for process %d: ", i + 1);
+       scanf("%d", &at[i]);
+       printf("Enter the burst time for process %d: ", i + 1);
+       scanf("%d", &bt[i]);
+       rt[i] = bt[i];
+   }
+ 
+   while (completed != n)
+   {
+       shortest = -1;
+       min_rt = 99999;
+ 
+       for (int i = 0; i < n; i++)
+       {
+           if (at[i] <= time && rt[i] > 0 && rt[i] < min_rt)
+           {
+               min_rt = rt[i];
+               shortest = i;
+           }
+       }
+ 
+       if (shortest == -1)
+       {
+           if (gc_index == 0 || gc_pid[gc_index - 1] != 0)
+           {
+               gc_pid[gc_index] = 0;
+               gc_time[gc_index] = time;
+               gc_index++;
+           }
+           time++;
+           continue;
+       }
+ 
+       if (gc_index == 0 || gc_pid[gc_index - 1] != pid[shortest])
+       {
+           gc_pid[gc_index] = pid[shortest];
+           gc_time[gc_index] = time;
+           gc_index++;
+       }
+ 
+       rt[shortest]--;
+       time++;
+ 
+       if (rt[shortest] == 0)
+       {
+           completed++;
+           finish_time = time;
+           ct[shortest] = finish_time;
+           tat[shortest] = ct[shortest] - at[shortest];
+           wt[shortest] = tat[shortest] - bt[shortest];
+           totaltat += tat[shortest];
+           totalwt += wt[shortest];
+       }
+   }
+ 
+   printf("\n-----------------------------------------------------------\n");
+   printf("PID\tAT\tBT\tCT\tTAT\tWT\n");
+   printf("-------------------------------------------------------------\n");
+   for (int i = 0; i < n; i++)
+   {
+       printf("%d\t%d\t%d\t%d\t%d\t%d\n", pid[i], at[i], bt[i], ct[i], tat[i], wt[i]);
+   }
+   printf("-------------------------------------------------------------\n");
+ 
+   printf("Average Turnaround Time: %.2f\n", totaltat / n);
+   printf("Average Waiting Time: %.2f\n", totalwt / n);
+ 
+   printf("\nGantt Chart:\n");
+   for (int i = 0; i < gc_index; i++)
+   {
+       if (gc_pid[i] == 0)
+           printf("| Idle ");
+       else
+           printf("|   P%d  ", gc_pid[i]);
+   }
+   printf("|\n");
+ 
+   for (int i = 0; i < gc_index; i++)
+   {
+       printf("%d\t", gc_time[i]);
+   }
+   printf("%d\n", time);
+ 
+   return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+5. Process Management
+
+
+
+
+i) IPC using Pipes:
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <unistd.h>
+#define MAX 20
+ 
+int main()
+{
+   int filedes[2], n;
+   char string[MAX];
+   char line[MAX];
+   pid_t pid;
+ 
+   printf("Enter the string to be given to the parent: ");
+   fflush(stdin);
+   if (fgets(string, MAX, stdin) == NULL)
+   {
+       printf("Error reading input.\n");
+       exit(1);
+   }
+   if ((pipe(filedes)) < 0)
+   {   printf("\nPipe creation error!");
+       exit(0); }
+ 
+   if ((pid = fork()) < 0)
+   {  printf("\nFork error!");
+       exit(0); }
+ 
+   if (pid > 0)
+   {   close(filedes[0]);
+       write(filedes[1], string, MAX);
+   }
+   if (pid == 0)
+   {
+       close(filedes[1]);
+       n = read(filedes[0], line, MAX);
+       line[n] = '\0';
+       printf("\n\nData read by child is : %s", line);
+   }
+   exit(0);
+}
+
+
+
+
+
+ii) Child Process:
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+
+int main()
+{
+  int pid = fork();
+  if (pid>0)
+{
+   printf("parent process id %d\n", getpid());
+   printf("child process id %d\n", pid);
+ }
+ else if (pid == 0)
+{
+  sleep(10);
+  printf("child process id %d\n", getpid());
+  printf("Parent process id %d\n", getppid());
+}
+return 0;
+}
+ 
+ 
+iii) Zombie Process:
+pid_t pid;
+if ((pid=fork())<0)
+  printf("\tFork error!\n");
+else if(pid == 0)
+{
+  printf("Child process id is: %d\n",getpid());
+}
+else
+{
+  sleep(10);
+  printf("********Parent:\n");
+  system("ps -axj | tail");
+}
+exit(0);
+}
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+ 
+6. Reader Writer Problem (Process Synchronization):
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+ 
+sem_t mutex, wrt;
+pthread_t tid;
+int sharedvar = 99;
+pthread_t writers[5], readers[5];
+int readercount = 0;
+ 
+void *reader(void *param)
+{
+   sem_wait(&mutex);
+   readercount++;
+   if (readercount == 1)
+       sem_wait(&wrt);
+   sem_post(&mutex);
+ 
+   printf("\n%d reader is reading sharedvar=%d", readercount, sharedvar);
+ 
+   sem_wait(&mutex);
+   readercount--;
+   if (readercount == 0)
+       sem_post(&wrt);
+   sem_post(&mutex);
+ 
+   printf("\n%d Reader is done\n", readercount + 1);
+   return NULL;
+}
+ 
+void *writer(void *param)
+{
+   printf("\nWriter is trying to enter");
+   sem_wait(&wrt);
+   printf("\nWriter has entered Critcal Section(CS)");
+   sharedvar++;
+   printf("\nWriter has changed the value of SHAREDVAR to %d", sharedvar);
+   sem_post(&wrt);
+   printf("\nWriter is out of the Critical Section");
+   return NULL;
+}
+ 
+int main()
+{
+   int n, i;
+   printf("Enter the number of readers: ");
+   scanf("%d", &n);
+ 
+   sem_init(&mutex, 0, 1);
+   sem_init(&wrt, 0, 1);
+ 
+   for (i = 0; i < n; i++)
+   {
+       pthread_create(&writers[i], NULL, writer, NULL);
+       pthread_create(&readers[i], NULL, reader, NULL);
+   }
+ 
+   for (i = 0; i < n; i++)
+   {
+       pthread_join(writers[i], NULL);
+       pthread_join(readers[i], NULL);
+   }
+ 
+   return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+7. Banker’s Algorithm (Process Synchronization):
+#include <stdio.h>
+#include <stdbool.h>
+ 
+int main()
+{
+   int n, m;
+   printf("Enter the number of processes: ");
+   scanf("%d", &n);
+   printf("Enter the number of resource types: ");
+   scanf("%d", &m);
+ 
+   int allocation[n][m], maximum[n][m], available[m], need[n][m];
+   printf("Enter Allocation matrix:\n");
+   for (int i = 0; i < n; i++)
+   {
+       printf("Process P%d: ", i);
+       for (int j = 0; j < m; j++)
+       {
+           scanf("%d", &allocation[i][j]);
+       }
+   }
+   printf("Enter Maximum matrix:\n");
+   for (int i = 0; i < n; i++)
+   {
+       printf("Process P%d: ", i);
+       for (int j = 0; j < m; j++)
+       {
+           scanf("%d", &maximum[i][j]);
+       }
+   }
+   printf("Enter Available resources:\n");
+   for (int i = 0; i < m; i++)
+   {
+       scanf("%d", &available[i]);
+   }
+ 
+   for (int i = 0; i < n; i++)
+   {
+       for (int j = 0; j < m; j++)
+       {
+           need[i][j] = maximum[i][j] - allocation[i][j];
+       }
+   }
+ 
+   bool f[n];
+   for (int i = 0; i < n; i++)
+       f[i] = false;
+ 
+   int safeseq[n], count = 0;
+   int work[m];
+ 
+   for (int i = 0; i < m; i++)
+       work[i] = available[i];
+ 
+   for (int k = 0; k < n; k++)
+   {
+       for (int i = 0; i < n; i++)
+       {
+           if (!f[i])
+           {
+               bool Finish = true;
+               for (int j = 0; j < m; j++)
+               {
+                   if (need[i][j] > work[j])
+                   {
+                       Finish = false;
+                       break;
+                   }
+               }
+               if (Finish)
+               {
+                   for (int j = 0; j < m; j++)
+                   {
+                       work[j] += allocation[i][j];
+                   }
+                   safeseq[count++] = i;
+                   f[i] = true;
+               }
+           }
+       }
+   }
+ 
+   bool safe = true;
+   for (int i = 0; i < n; i++)
+   {
+       if (!f[i])
+       {
+           safe = false;
+           break;
+       }
+   }
+   if (safe)
+   {
+       printf("System is in a SAFE state.\nSafe sequence: ");
+       for (int i = 0; i < n; i++)
+       {
+           printf("P%d ", safeseq[i]);
+       }
+       printf("\n");
+   }
+   else
+   {
+       printf("System is NOT in a safe state.\n");
+       return 1;
+   }
+   char choice = 'y';
+   while (choice == 'y' || choice == 'Y')
+   {
+       int pid;
+       printf("Enter the number of process making the resource request from (0-%d): ", n - 1);
+       scanf("%d", &pid);
+ 
+       if (pid < 0 || pid >= n)
+       {
+           printf("Invalid process ID.\n");
+           return 1;
+       }
+       int req[m];
+       printf("Enter the request vector required by process P%d: ", pid);
+       for (int i = 0; i < m; i++)
+       {
+           scanf("%d", &req[i]);
+       }
+ 
+       bool invalidRequest = false;
+       for (int i = 0; i < m; i++)
+       {
+           if (req[i] > need[pid][i])
+           {
+               printf("Error: Request exceeds process's maximum claim.\n");
+               invalidRequest = true;
+               break;
+           }
+           if (req[i] > available[i])
+           {
+               printf("Resources are not available. Processes must wait.\n");
+               invalidRequest = true;
+               break;
+           }
+       }
+       if (invalidRequest)
+       {
+           printf("Do you want to make another request? (y/n): ");
+           scanf(" %c", &choice);
+           continue;
+       }
+ 
+       for (int i = 0; i < m; i++)
+       {
+           available[i] = available[i] - req[i];
+           allocation[pid][i] = allocation[pid][i] + req[i];
+           need[pid][i] = need[pid][i] - req[i];
+       }
+ 
+       for (int i = 0; i < m; i++)
+           work[i] = available[i];
+       for (int i = 0; i < n; i++)
+           f[i] = false;
+       count = 0;
+ 
+       for (int k = 0; k < n; k++)
+       {
+           for (int i = 0; i < n; i++)
+           {
+               if (!f[i])
+               {
+                   bool Finish = true;
+                   for (int j = 0; j < m; j++)
+                   {
+                       if (need[i][j] > work[j])
+                       {
+                           Finish = false;
+                           break;
+                       }
+                   }
+                   if (Finish)
+                   {
+                       for (int j = 0; j < m; j++)
+                       {
+                           work[j] += allocation[i][j];
+                       }
+                       safeseq[count++] = i;
+                       f[i] = true;
+                   }
+               }
+           }
+       }
+       safe = true;
+       for (int i = 0; i < n; i++)
+       {
+           if (!f[i])
+           {
+               safe = false;
+               break;
+           }
+       }
+       if (safe)
+       {
+           printf("Request granted. System remains in a SAFE state.\nSafe sequence: ");
+           for (int i = 0; i < n; i++)
+           {
+               printf("P%d ", safeseq[i]);
+           }
+           printf("\n");
+       }
+       else
+       {
+           for (int i = 0; i < m; i++)
+           {
+               available[i] += req[i];
+               allocation[pid][i] -= req[i];
+               need[pid][i] += req[i];
+           }
+           printf("Request denied. System would enter an UNSAFE state.\n");
+       }
+ 
+       printf("Do you want to make another request? (y/n): ");
+       scanf(" %c", &choice);
+   }
+   printf("Exiting the program.\n");
+   return 0;
+}
+
+
+
+
+
+
+
+
+8. FIFO: Page Replacement (Memory Management):
+#include <stdio.h>
+#define MAX 100
+ 
+typedef struct {
+   int arr[MAX];    
+   int size;        
+   int capacity;    
+   int nextReplace;  
+} MemoryFrames;
+ 
+void initMemory(MemoryFrames *m, int capacity) {
+   m->size = 0;
+   m->capacity = capacity;
+   m->nextReplace = 0;
+}
+ 
+int isPresent(MemoryFrames *m, int page) {
+   for (int i = 0; i < m->size; i++) {
+       if (m->arr[i] == page) {
+           return 1;
+       }
+   }
+   return 0;
+}
+ 
+void insertPage(MemoryFrames *m, int page) {
+   if (m->size < m->capacity) {
+       m->arr[m->size] = page;
+       m->size++;
+   } else {
+       m->arr[m->nextReplace] = page;
+       m->nextReplace = (m->nextReplace + 1) % m->capacity;
+   }
+}
+ 
+int main() {
+   int frames, pages;
+   printf("Enter number of pages: ");
+   scanf("%d", &pages);
+ 
+   int pageReferences[pages];
+   printf("Enter the page reference string: ");
+   for (int i = 0; i < pages; i++) {
+       scanf("%d", &pageReferences[i]);
+   }
+   printf("Enter number of frames: ");
+   scanf("%d", &frames);
+   MemoryFrames memory;
+   initMemory(&memory, frames);
+ 
+   int pageFaults = 0, pageHits = 0;
+ 
+   printf("\n--- FIFO Page Replacement ---\n");
+ 
+   for (int i = 0; i < pages; i++) {
+       int currentPage = pageReferences[i];
+       int found = isPresent(&memory, currentPage);
+ 
+       if (found) {
+           pageHits++;
+       } else {
+           pageFaults++;
+           insertPage(&memory, currentPage);
+       }
+ 
+       printf("\nPage %2d --> ", currentPage);
+       for (int k = 0; k < frames; k++) {
+           if (k < memory.size)
+               printf("%2d ", memory.arr[k]);
+           else
+               printf(" - ");
+       }
+ 
+       if (found)
+           printf(" (Hit)");
+       else
+           printf(" (Page Fault)");
+   }
+   float hit_ratio = (float)pageHits / pages;
+   float fault_ratio = (float)pageFaults / pages;
+ 
+   printf("\n\nTotal Pages: %d", pages);
+   printf("\nTotal Page Faults: %d", pageFaults);
+   printf("\nTotal Hits: %d", pageHits);
+   printf("\nFault Ratio: %.2f", fault_ratio);
+   printf("\nHit Ratio: %.2f\n", hit_ratio);
+   return 0;
+}
+
+
+
+
+
+
+
+
+
+9. LRU: Page Replacement (Memory Management):
+#include <stdio.h>
+
+int main() {
+    int pages[50], frames[10];
+    int n, f, i, j, k, faults = 0, hits = 0;
+    float hit_ratio, fault_ratio;
+    int recent[10];
+
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    printf("Enter the page reference string: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &pages[i]);
+
+    printf("Enter number of frames: ");
+    scanf("%d", &f);
+
+    for (i = 0; i < f; i++) {
+        frames[i] = -1;
+        recent[i] = 0;
+    }
+
+    printf("\n--- LRU Page Replacement ---\n");
+
+    for (i = 0; i < n; i++) {
+        int found = 0;
+
+        for (j = 0; j < f; j++) {
+            if (frames[j] == pages[i]) {
+                found = 1;
+                hits++;
+                recent[j] = i + 1;
+                break;
+            }
+        }
+
+        if (!found) {
+            int min = 0;
+            for (j = 1; j < f; j++) {
+                if (recent[j] < recent[min])
+                    min = j;
+            }
+            frames[min] = pages[i];
+            recent[min] = i + 1;
+            faults++;
+        }
+
+        printf("\nPage %2d --> ", pages[i]);
+        for (k = 0; k < f; k++) {
+            if (frames[k] == -1)
+                printf(" - ");
+            else
+                printf("%2d ", frames[k]);
+        }
+
+        if (found)
+            printf(" (Hit)");
+        else
+            printf(" (Page Fault)");
+    }
+
+    hit_ratio = (float)hits / n;
+    fault_ratio = (float)faults / n;
+
+    printf("\n\nTotal Pages: %d", n);
+    printf("\nTotal Page Faults: %d", faults);
+    printf("\nTotal Hits: %d", hits);
+    printf("\nFault Ratio: %.2f", fault_ratio);
+    printf("\nHit Ratio: %.2f\n", hit_ratio);
+
+    return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
