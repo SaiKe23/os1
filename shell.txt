@@ -1,0 +1,61 @@
+#!/bin/bash
+
+echo "Calculator:"
+echo "1) Addition"
+echo "2) Subtraction"
+echo "3) Multiplication"
+echo "4) Division"
+echo
+
+echo "Enter 1st number:"
+read a
+echo
+
+echo "Enter 2nd number:"
+read b
+echo
+
+echo "Enter which operation to perform (1-4):"
+read var
+echo
+
+case $var in
+ 1) echo "$a + $b = $(expr $a + $b)" ;; 
+ 2) echo "$a - $b = $(expr $a - $b)" ;; 
+ 3) echo "$a * $b = $(expr $a \* $b)" ;; 
+ 4) 
+    if [ $b -eq 0 ]; then
+       echo "Error: Division by zero is not allowed."
+    else
+       echo "$a / $b = $(echo "scale=2; $a / $b" | bc)"
+    fi
+    ;;
+ *) echo "Invalid option selected!" ;;
+    esac
+
+#!/bin/bash
+
+# 1. Create directory and subdirectory
+mkdir -p myfolder/subfolder
+
+# 2. Go into the main directory
+cd myfolder
+
+# 3. Create a .txt file using cat (user types content, press CTRL+D to finish)
+echo "Enter text for sample.txt (Press CTRL+D to save):"
+cat > sample.txt
+
+# 4. Make a copy of the file and rename it
+cp sample.txt copy_sample.txt
+
+# 5. Set permissions:
+# Owner: read, write, execute (7)
+# Group: read only (4)
+# Others: read only (4)
+chmod 744 sample.txt
+chmod 744 copy_sample.txt
+
+# 6. List files with permissions
+echo
+echo "Listing all files with details:"
+ls -l
